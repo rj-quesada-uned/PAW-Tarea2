@@ -1,0 +1,98 @@
+﻿@model Tarea2.Models.Encuesta
+
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Create</h2>
+
+
+@using (Html.BeginForm()) 
+{
+    @Html.AntiForgeryToken()
+    
+<div class="form-horizontal">
+    <h4>Encuesta</h4>
+    <hr />
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    <div class="form-group">
+        @Html.LabelFor(model => model.NombreEncuestado, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.EditorFor(model => model.NombreEncuestado, new { htmlAttributes = new { @class = "form-control" } })
+            @Html.ValidationMessageFor(model => model.NombreEncuestado, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.ApellidoEncuestado, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.EditorFor(model => model.ApellidoEncuestado, new { htmlAttributes = new { @class = "form-control" } })
+            @Html.ValidationMessageFor(model => model.ApellidoEncuestado, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Pais, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.EnumDropDownListFor(model => model.Pais, htmlAttributes: new { @class = "form-control" })
+            @Html.ValidationMessageFor(model => model.Pais, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.RolTI, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.EnumDropDownListFor(model => model.RolTI, htmlAttributes: new { @class = "form-control" })
+            @Html.ValidationMessageFor(model => model.RolTI, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.LenguajePrimario, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            <select class="form-control" name="LenguajePrimario" id="LenguajePrimario" required>
+                <option value="PHP">PHP</option>
+                <option value="Javascript">Javascript</option>
+                <option value="Java">Java</option>
+                <option value="Python">Python</option>
+                <option value="Typescript">Typescript</option>
+                <option value="Ruby">Ruby</option>
+                <option value="Go">Go</option>
+            </select>
+            @Html.ValidationMessageFor(model => model.LenguajePrimario, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.LenguajeSecundario, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            <select class="form-control" name="LenguajeSecundario" id="LenguajeSecundario" required>
+                <option value="PHP">PHP</option>
+                <option value="Javascript">Javascript</option>
+                <option value="Java">Java</option>
+                <option value="Python">Python</option>
+                <option value="Typescript">Typescript</option>
+                <option value="Ruby">Ruby</option>
+                <option value="Go">Go</option>
+            </select>            
+            @Html.ValidationMessageFor(model => model.LenguajeSecundario, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <input type="submit" value="Create" class="btn btn-primary" />
+        </div>
+    </div>
+</div>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index", null, new { @class = "btn btn-danger" })
+
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

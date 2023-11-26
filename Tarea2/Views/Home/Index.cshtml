@@ -1,0 +1,101 @@
+﻿@model Tuple<List<Tarea2.Models.Encuesta>, List<Tarea2.Models.LenguajePopularidad>>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create", null, new { @class = "btn btn-primary" })
+</p>
+@if (Model.Item1 != null && Model.Item1.Any())
+{
+    <table class="table">
+        <tr>
+            <th>
+                Nombre
+            </th>
+            <th>
+                Apellido
+            </th>
+            <th>
+                Pais
+            </th>
+            <th>
+                Rol TI
+            </th>
+            <th>
+                Lenguaje Primario
+            </th>
+            <th>
+                Lenguaje Secundario
+            </th>
+            <th></th>
+        </tr>
+
+        @foreach (var item in Model.Item1)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.NombreEncuestado)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ApellidoEncuestado)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Pais)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.RolTI)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.LenguajePrimario)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.LenguajeSecundario)
+                </td>
+            </tr>
+        }
+    </table>
+}
+else
+{
+    <p>No hay datos de encuestas disponibles.</p>
+}
+
+<h2>Lenguajes Populares</h2>
+@{
+    int indice = 1;
+}
+@if (Model.Item2 != null && Model.Item2.Any())
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Posición</th>
+                <th>Nombre del Lenguaje</th>
+                <th>Clasificación (porcentual)</th>
+                <th>Diferencia Porcentual</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var lenguaje in Model.Item2)
+            {
+                <tr>
+                    <td>@indice</td>
+                    <td>@lenguaje.NombreLenguaje</td>
+                    <td>@lenguaje.Clasificacion</td>
+                    <td>@lenguaje.DiferenciaPorcentual</td>
+                </tr>
+                indice++;
+            }
+
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No hay datos de popularidad de lenguajes disponibles.</p>
+}
