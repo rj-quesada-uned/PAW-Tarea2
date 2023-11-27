@@ -15,7 +15,7 @@ namespace Tarea2.Controllers
         public ActionResult Index()
         {
             List<Encuesta> encuestas = ObtenerEncuestas();
-            List<LenguajePopularidad> popularidadLenguajes = ObtenerPopularidadLenguajes(encuestas);
+            List<LenguajePopularidad> popularidadLenguajes = ObtenerLenguajes();
 
             var modeloCompuesto = new Tuple<List<Encuesta>, List<LenguajePopularidad>>(encuestas, popularidadLenguajes);
 
@@ -45,52 +45,49 @@ namespace Tarea2.Controllers
                 popularidadLenguajes = new List<LenguajePopularidad>();
             }
 
-            string lenguajePrimario = encuesta.LenguajePrimario;
-            var lenguajeExistente = popularidadLenguajes.FirstOrDefault(x => x.NombreLenguaje == lenguajePrimario);
-            if (lenguajeExistente != null)
+            if (encuesta.LenguajePrimario == encuesta.LenguajeSecundario)
             {
-                lenguajeExistente.Clasificacion += 1;
-            }
-            else
-            {
-                popularidadLenguajes.Add(new LenguajePopularidad
-                {
-                    Posicion = 1,
-                    NombreLenguaje = lenguajePrimario,
-                    Clasificacion = 1,
-                    DiferenciaPorcentual = 0
-                });
+                ModelState.AddModelError("LenguajeSecundario", "El lenguaje secundario no puede ser igual al lenguaje primario.");
+                return View(encuesta);
             }
 
-            // Copia la lista antes de asignarla a la sesión
+            string lenguajePrimario = encuesta.LenguajePrimario;
+            string lenguajeSecundario = encuesta.LenguajeSecundario;
+
+            IncrementarPopularidad(popularidadLenguajes, encuesta.LenguajePrimario, 1);
+            IncrementarPopularidad(popularidadLenguajes, encuesta.LenguajeSecundario, 0.5);
+
             List<LenguajePopularidad> copiaPopularidadLenguajes = new List<LenguajePopularidad>(popularidadLenguajes);
             Session[LenguajesKey] = copiaPopularidadLenguajes;
 
             encuestas.Add(encuesta);
             Session[EncuestasKey] = encuestas;
-            if (encuesta.LenguajePrimario == encuesta.LenguajeSecundario)
-            {
-                // Si los lenguajes primario y secundario son iguales, muestra un mensaje de error
-                ModelState.AddModelError("LenguajeSecundario", "El lenguaje secundario no puede ser igual al lenguaje primario.");
-                // Puedes personalizar el mensaje de error según tus necesidades
-                return View(encuesta);
-            }
+
             return RedirectToAction("Index");
         }
 
         private List<Encuesta> ObtenerEncuestas()
         {
             List<Encuesta> encuestas = Session[EncuestasKey] as List<Encuesta>;
-            List<LenguajePopularidad> popularidadLenguajes = ObtenerPopularidadLenguajes(encuestas);
 
             if (encuestas == null)
             {
                 encuestas = new List<Encuesta>();
             }
 
-            Session[LenguajesKey] = popularidadLenguajes;
-
             return encuestas;
+        }
+
+        private List<LenguajePopularidad> ObtenerLenguajes()
+        {
+            List<LenguajePopularidad> lenguajes = Session[LenguajesKey] as List<LenguajePopularidad>;
+
+            if (lenguajes == null)
+            {
+                lenguajes = new List<LenguajePopularidad>();
+            }
+
+            return lenguajes;
         }
 
 
@@ -116,39 +113,37 @@ namespace Tarea2.Controllers
 
         private void IncrementarPopularidad(List<LenguajePopularidad> popularidadLenguajes, string nombreLenguaje, double incremento)
         {
-            if (popularidadLenguajes != null && popularidadLenguajes.Any())
+            var lenguajeExistente = popularidadLenguajes.FirstOrDefault(x => x.NombreLenguaje == nombreLenguaje);
+            if (lenguajeExistente != null)
             {
-                var lenguaje = popularidadLenguajes.FirstOrDefault(x => x.NombreLenguaje == nombreLenguaje);
-                if (lenguaje != null)
-                {
-                    lenguaje.Clasificacion += incremento;
+                lenguajeExistente.Clasificacion += incremento;
 
-                    // Calcular la diferencia porcentual en relación con el elemento anterior
-                    int posicion = popularidadLenguajes.FindIndex(x => x.NombreLenguaje == nombreLenguaje);
-                    if (posicion > 0)
-                    {
-                        double diferenciaPorcentual = lenguaje.Clasificacion - popularidadLenguajes[posicion - 1].Clasificacion;
-                        lenguaje.DiferenciaPorcentual = diferenciaPorcentual;
-                    }
-                    else
-                    {
-                        // Si es el primer elemento, la diferencia porcentual es igual a la clasificación
-                        lenguaje.DiferenciaPorcentual = lenguaje.Clasificacion;
-                    }
+                // Calcular la diferencia porcentual en relación con el elemento anterior
+                int posicion = popularidadLenguajes.FindIndex(x => x.NombreLenguaje == nombreLenguaje);
+                if (posicion > 0)
+                {
+                    double diferenciaPorcentual = lenguajeExistente.Clasificacion - popularidadLenguajes[posicion - 1].Clasificacion;
+                    lenguajeExistente.DiferenciaPorcentual = diferenciaPorcentual;
                 }
                 else
                 {
-                    int nuevaPosicion = popularidadLenguajes.Count + 1;
-
-                    popularidadLenguajes.Add(new LenguajePopularidad
-                    {
-                        Posicion = nuevaPosicion,
-                        NombreLenguaje = nombreLenguaje,
-                        Clasificacion = incremento,
-                        DiferenciaPorcentual = 0
-                    });
+                    // Si es el primer elemento, la diferencia porcentual es igual a la clasificación
+                    lenguajeExistente.DiferenciaPorcentual = lenguajeExistente.Clasificacion;
                 }
             }
+            else
+            {
+                int nuevaPosicion = popularidadLenguajes.Count + 1;
+
+                popularidadLenguajes.Add(new LenguajePopularidad
+                {
+                    Posicion = nuevaPosicion,
+                    NombreLenguaje = nombreLenguaje,
+                    Clasificacion = incremento,
+                    DiferenciaPorcentual = 0
+                });
+            }
+
         }
     }
 }
